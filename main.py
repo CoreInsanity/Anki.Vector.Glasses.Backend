@@ -17,19 +17,16 @@ class FileUploadServer(BaseHTTPRequestHandler):
         with open(filename, 'wb') as output_file:
             output_file.write(self.rfile.read(file_length))
 
-        try:
-            self.send_response(200)
-            self.send_header("Content-type", "application/json")
-            self.end_headers()
-            self.wfile.write(bytes("{", "utf-8"))
-            print("Valid image found, detecting objects...")
-            for detection in detect(filename, minProbability):
-                self.wfile.write(bytes("""\"{0}\": {1},""".format(str(detection[0]), str(detection[1])), "utf-8"))
-            self.wfile.write(bytes("}", "utf-8"))
-            print("Object detection completed")
-        except:
-            print("sumting wong")
-            self.send_response(500)
+        self.send_response(200)
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
+        self.wfile.write(bytes("{", "utf-8"))
+        print("Valid image found, detecting objects...")
+        for detection in detect(filename, minProbability):
+            self.wfile.write(bytes("""\"{0}\": {1},""".format(str(detection[0]), str(detection[1])), "utf-8"))
+        self.wfile.write(bytes("}", "utf-8"))
+        os.remove(filename)
+        print("Object detection completed")
 
 
 if __name__ == "__main__":        
